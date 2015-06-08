@@ -34,7 +34,7 @@ def request_url(url):
     retry = 2
     for i in range(0, retry):
         try:
-            data = urllib2.urlopen(url,timeout=10).read()
+            data = urllib2.urlopen(url,timeout=5).read()
             return data
         except Exception as e:
             print 'Exception info:', e
@@ -103,8 +103,11 @@ def login(uname, pwd, address):
     }
     cookie_jar = cookielib.LWPCookieJar()
     cookie_support = urllib2.HTTPCookieProcessor(cookie_jar)
-    proxy = urllib2.ProxyHandler({'http': address})
-    opener = urllib2.build_opener(cookie_support, proxy)
+    if address=='localhost':
+        opener = urllib2.build_opener(cookie_support)
+    else:
+        proxy = urllib2.ProxyHandler({'http': address})
+        opener = urllib2.build_opener(cookie_support, proxy)
     # set opener as global
     urllib2.install_opener(opener)
     login_url = 'http://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.18)'
@@ -150,7 +153,7 @@ def login(uname, pwd, address):
     )
 
     result = request_url(req_login)
-    print(result)
+    print 'response for post:',result
     try:
         text = auto_decode(result)
     except Exception as e:
@@ -187,15 +190,24 @@ def login(uname, pwd, address):
             return login(uname, pwd, address)
         else:
             raise Exception('login')
+    '''
+    else:
+        cookie_dict = dict()
+        for ck in cookie_jar:
+            cookie_dict[ck.name] = ck.value
+        return str(cookie_dict)
+    '''
 
     # get url feedback to finally confirm login status
     data = request_url(redirect_url)
     data = auto_decode(data)
+
     try:
         patt_feedback = 'parent.sinaSSOController.feedBackUrlCallBack\((.*?)\)'
         p = re.compile(patt_feedback, re.MULTILINE)
         feedback = p.search(data).group(1)
         feedback_json = json.loads(feedback)
+        print 'response for redirect url:',data
     except Exception as e:
         print 'Error occured for finally confirm login status!'
         print 'Data received:', data

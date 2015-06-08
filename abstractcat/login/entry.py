@@ -74,6 +74,9 @@ class EntryManager:
 
         return False
 
+    def check_entry(self):
+        pass
+
     def add_accounts(self, fname):
         sql = 'INSERT INTO account values(%s,%s,%s);'
         f = open(fname)
