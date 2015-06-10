@@ -13,9 +13,13 @@ import time
 import random
 import urlparse
 import cookielib
+
 import chardet
 import rsa
+
 from abstractcat.login import captcha
+
+
 
 
 
@@ -33,8 +37,9 @@ def request_url(url):
     # try serval times
     retry = 2
     for i in range(0, retry):
+        time.sleep(1)
         try:
-            data = urllib2.urlopen(url,timeout=5).read()
+            data = urllib2.urlopen(url, timeout=5).read()
             return data
         except Exception as e:
             print 'Exception info:', e
@@ -103,7 +108,7 @@ def login(uname, pwd, address):
     }
     cookie_jar = cookielib.LWPCookieJar()
     cookie_support = urllib2.HTTPCookieProcessor(cookie_jar)
-    if address=='localhost':
+    if address == 'localhost':
         opener = urllib2.build_opener(cookie_support)
     else:
         proxy = urllib2.ProxyHandler({'http': address})
@@ -114,6 +119,10 @@ def login(uname, pwd, address):
 
     # get prelogin status
     servertime, nonce, rsakv, showpin, pcid = get_prelogin_status(uname)
+    print servertime, nonce, rsakv, showpin, pcid
+    #pin required for 163 mail
+    if uname.endswith('@163.com'):
+        showpin=1
 
     # Fill POST data
     login_data['servertime'] = servertime
@@ -153,7 +162,7 @@ def login(uname, pwd, address):
     )
 
     result = request_url(req_login)
-    print 'response for post:',result
+    print 'response for post:', result
     try:
         text = auto_decode(result)
     except Exception as e:
@@ -186,7 +195,7 @@ def login(uname, pwd, address):
             print 'Exception info:', e
             raise Exception('login')
 
-        if reason == u'输入的验证码不正确':
+        if reason in [u'输入的验证码不正确',u'为了您的帐号安全，请输入验证码']:
             return login(uname, pwd, address)
         else:
             raise Exception('login')
@@ -207,7 +216,7 @@ def login(uname, pwd, address):
         p = re.compile(patt_feedback, re.MULTILINE)
         feedback = p.search(data).group(1)
         feedback_json = json.loads(feedback)
-        print 'response for redirect url:',data
+        print 'response for redirect url:', data
     except Exception as e:
         print 'Error occured for finally confirm login status!'
         print 'Data received:', data
@@ -303,9 +312,13 @@ def random_number(randomlength=8):
         rn += str(random.randint(0, 9))
     return rn
 
+
 def auto_decode(data):
     encoding = chardet.detect(data)['encoding']
     print('encoding', encoding)
     if encoding not in ['ascii', None]:
         data = data.decode(encoding)
     return data
+
+
+#create_cookie('rxqk68828@163.com', 'q123456', 'localhost')

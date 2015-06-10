@@ -2,8 +2,6 @@
 
 __author__ = 'abstractcat'
 
-import time
-
 from abstractcat.db import postgres
 from abstractcat.login import login
 
@@ -68,14 +66,11 @@ class EntryManager:
                 return True
 
             # remove proxy address if received a bad request status
-            if status == 1:
-                print 'proxy address %s removed.' % address
-                self.remove_proxy(address)
+            #if status == 1:
+            #    print 'proxy address %s removed.' % address
+            #    self.remove_proxy(address)
 
         return False
-
-    def check_entry(self):
-        pass
 
     def add_accounts(self, fname):
         sql = 'INSERT INTO account values(%s,%s,%s);'
@@ -84,4 +79,3 @@ class EntryManager:
         accounts = map(lambda x: x.strip().split('\t'), lines)
         for (uname, pwd) in accounts:
             self.db.execute_param(sql, (uname, pwd, True))
-
