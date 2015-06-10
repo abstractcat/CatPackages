@@ -9,6 +9,7 @@ WITH (OIDS=FALSE)
 
 ALTER TABLE "public"."account" OWNER TO "postgres";
 
+
 CREATE TABLE "public"."entry" (
 "uname" varchar NOT NULL,
 "address" varchar,
@@ -20,6 +21,7 @@ WITH (OIDS=FALSE)
 
 ALTER TABLE "public"."entry" OWNER TO "postgres";
 
+
 CREATE TABLE "public"."proxy" (
 "address" varchar NOT NULL,
 CONSTRAINT "proxy_pkey" PRIMARY KEY ("address")
@@ -29,10 +31,12 @@ WITH (OIDS=FALSE)
 
 ALTER TABLE "public"."proxy" OWNER TO "postgres";
 
+
 CREATE TABLE "public"."repost" (
 "root_mid" char(16) NOT NULL,
 "repost_mid" char(16) NOT NULL,
 "uid" char(10),
+"uname" varchar,
 "content" varchar,
 "tm" timestamp(6),
 "repost_num" int4,
@@ -45,14 +49,17 @@ WITH (OIDS=FALSE)
 
 ALTER TABLE "public"."repost" OWNER TO "postgres";
 
+
 CREATE TABLE "public"."retry" (
 "url" varchar NOT NULL,
+"type" int2,
 CONSTRAINT "retry_pkey" PRIMARY KEY ("url")
 )
 WITH (OIDS=FALSE)
 ;
 
 ALTER TABLE "public"."retry" OWNER TO "postgres";
+
 
 CREATE TABLE "public"."user" (
 "uid" char(10) NOT NULL,
@@ -68,6 +75,7 @@ WITH (OIDS=FALSE)
 ;
 
 ALTER TABLE "public"."user" OWNER TO "postgres";
+
 
 CREATE TABLE "public"."weibo" (
 "mid" char(16) NOT NULL,
